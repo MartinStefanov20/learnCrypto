@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:include="~{/fragments/head}"> </th:block>
+</head>
+
+<body>
+
+<header id="header" class="fixed-top">
+    <th:block th:include="~{/fragments/user-nav}"> </th:block>
+</header>
+
+<div class="move"></div>
+<section id="featured-services" class="featured-services">
+    <div class="main-container container py-5 px-4">
+        <div class="card py-5 px-4 mx-auto">
+
+            <h3 class="bg-danger text-center mb-5 p-2">Your Score</h3>
+
+            <div class="d-flex justify-content-center">
+                <p>Participant name:&nbsp;&nbsp;</p>
+                <p th:text="${username}"></p>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <p>Total correct answer:&nbsp;&nbsp;</p>
+                <p>0</p>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <p>Total false answer:&nbsp;&nbsp;</p>
+                <p>0</p>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <button type="button" th:onclick="window.location.href='/home'"
+                        class="btn btn-outline-warning mx-auto">Back to Homepage</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer id="footer">
+    <th:block th:include="~{/fragments/footer}"> </th:block>
+</footer><!-- End Footer -->
+
+<th:block th:include="~{/fragments/scripts}"> </th:block>
+</body>
