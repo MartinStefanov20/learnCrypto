@@ -36,7 +36,7 @@ public class QuizController {
 
         model.addAttribute("quiz", quiz);
 
-        quizService.saveQuiz(quiz, username);
+//        quizService.saveQuiz(quiz, username);
 
         return "quiz";
     }
