@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:include="~{/fragments/head}"></th:block>
+</head>
+
+<body>
+
+<header id="header" class="fixed-top">
+    <th:block th:include="~{/fragments/user-nav}"> </th:block>
+</header>
+
+<section>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Price</th>
+                <th scope="col">1h %</th>
+                <th scope="col">24h %</th>
+                <th scope="col">7d %</th>
+                <th scope="col">Circulating Supply</th>
+            </tr>
+            <tr th:scope="row" th:each="temp : ${content}">
+                <td th:text="${temp.name}"></td>
+                <td th:text="${temp.symbol}"</td>
+                <td th:text="${temp.price}"></td>
+                <td th:text="${temp.percent_change_1h}"></td>
+                <td th:text="${temp.percent_change_24h}"></td>
+                <td th:text="${temp.percent_change_7d}"></td>
+                <td th:text="${temp.circulating_supply}"></td>
+            </tr>
+        </table>
+    </div>
+
+
+</section>
+
+<footer id="footer">
+    <th:block th:include="~{/fragments/footer}"></th:block>
+</footer>
+
+<th:block th:include="~{/fragments/scripts}"></th:block>
+
+</body>

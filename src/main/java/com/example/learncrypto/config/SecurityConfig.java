@@ -54,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers("/users/login", "/", "/users/login-error", "/resources/**", "/index").permitAll()
-                .antMatchers("/home", "/basics", "/earn-crypto", "trade-crypto", "use-crypto", "quiz", "result").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/home", "/basics", "/earn-crypto", "trade-crypto", "use-crypto", "quiz", "result", "charts").hasAnyRole("ADMIN", "USER")
                 .and()
                 .exceptionHandling().accessDeniedPage("/access-denied")
                 .and()
