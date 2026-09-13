@@ -1,0 +1,76 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "src/**"
+      - "pom.xml"
+      - "Dockerfile"
+      - ".github/workflows/deploy-cloud-run.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # Workload Identity Federation: no long-lived GCP keys in GitHub
+
+concurrency:
+  group: deploy-cloud-run
+  cancel-in-progress: false
+
+env:
+  REGION: europe-west3
+  SERVICE: learncrypto
+  IMAGE: europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/apps/learncrypto:${{ github.sha }}
+
+jobs:
+  deploy:
+    name: Build image, push and deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west3-docker.pkg.dev --quiet
+
+      - name: Build image
+        run: docker build -t "$IMAGE" .
+
+      - name: Push image
+        run: docker push "$IMAGE"
+
+      - name: Deploy to Cloud Run
+        # COINGECKO_API_KEY is optional: without it the app uses the public CoinGecko endpoint
+        # (lower rate limit) and falls back to the bundled snapshot when the API is unavailable.
+        # Set a repository secret COINGECKO_API_KEY to send the x-cg-demo-api-key header.
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE" \
+            --region "$REGION" \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 8080 \
+            --memory 512Mi \
+            --cpu 1 \
+            --cpu-boost \
+            --min-instances 0 \
+            --max-instances 1 \
+            --set-env-vars "COINGECKO_API_KEY=${{ secrets.COINGECKO_API_KEY }}" \
+            --quiet
+
+      - name: Smoke test
+        run: |
+          URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --format 'value(status.url)')"
+          echo "Service URL: $URL"
+          curl -fsS --retry 5 --retry-delay 5 --retry-all-errors "$URL/actuator/health"
+          echo
+          curl -fsS -o /dev/null -w 'GET / -> %{http_code}\n' "$URL/"
