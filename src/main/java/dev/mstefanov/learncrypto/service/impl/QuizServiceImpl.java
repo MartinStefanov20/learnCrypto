@@ -1,35 +1,32 @@
 package dev.mstefanov.learncrypto.service.impl;
 
 import dev.mstefanov.learncrypto.model.Question;
-import dev.mstefanov.learncrypto.model.Quiz;
-import dev.mstefanov.learncrypto.model.User;
+import dev.mstefanov.learncrypto.model.binding.QuizSubmission;
 import dev.mstefanov.learncrypto.repository.QuestionRepository;
-import dev.mstefanov.learncrypto.repository.QuizRepository;
-import dev.mstefanov.learncrypto.repository.ResultRepository;
+import dev.mstefanov.learncrypto.service.QuizResult;
 import dev.mstefanov.learncrypto.service.QuizService;
-import dev.mstefanov.learncrypto.service.UserService;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class QuizServiceImpl implements QuizService {
 
-    private final QuizRepository quizRepository;
+    /** Number of questions shown per quiz round. */
+    static final int QUESTIONS_PER_QUIZ = 5;
+
     private final QuestionRepository questionRepository;
-    private final ResultRepository resultRepository;
-    private final UserService userService;
 
-    public QuizServiceImpl(QuizRepository quizRepository, QuestionRepository questionRepository, ResultRepository resultRepository, UserService userService) {
-        this.quizRepository = quizRepository;
+    public QuizServiceImpl(QuestionRepository questionRepository) {
         this.questionRepository = questionRepository;
-        this.resultRepository = resultRepository;
-        this.userService = userService;
     }
-
 
     @Override
     public List<Question> getAllQuestions() {
@@ -37,116 +34,64 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public Quiz makeQuiz() {
-        List<Question> allQuestions = this.getAllQuestions();
-        List<Question> questionForQuiz = new ArrayList<Question>();
-
-        Random random = new Random();
-
-        for(int i=0; i<5; i++) {
-            int rand = random.nextInt(allQuestions.size());
-            questionForQuiz.add(allQuestions.get(rand));
-            allQuestions.remove(rand);
-        }
-
-        Quiz quiz = new Quiz();
-
-        quiz.setQuestions(questionForQuiz);
-
-        return quiz;
+    public List<Question> makeQuiz() {
+        List<Question> all = new ArrayList<>(getAllQuestions());
+        Collections.shuffle(all);
+        return all.subList(0, Math.min(QUESTIONS_PER_QUIZ, all.size()));
     }
 
     @Override
-    public Quiz findOneById(Long id) {
-        return quizRepository.findOneById(id);
-    }
+    @Transactional(readOnly = true)
+    public QuizResult score(QuizSubmission submission) {
+        List<QuizSubmission.QuizAnswer> answers = submission.getAnswers() == null
+                ? List.of() : submission.getAnswers();
 
-    @Override
-    public Quiz findQuizForUserWithUsername(String name){
+        List<Long> ids = answers.stream()
+                .map(QuizSubmission.QuizAnswer::getQuestionId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
 
-        return this.quizRepository.findOneByUserUsername(name);
-    }
+        Map<Long, Question> byId = questionRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Question::getId, Function.identity()));
 
-    @Override
-    public Integer getResult(Long id) {
         int correct = 0;
-
-        Quiz quiz = this.findOneById(id);
-
-        for(Question question: quiz.getQuestions())
-            if(question.getAns() == question.getChoice())
+        for (QuizSubmission.QuizAnswer answer : answers) {
+            Question question = byId.get(answer.getQuestionId());
+            if (question != null && answer.getChoice() != null && answer.getChoice() == question.getAns()) {
                 correct++;
-
-        return correct;
-    }
-
-
-    @Override
-    public void saveQuiz(Quiz quiz, String username) {
-        User user = this.userService.getUserByUsername(username);
-        quiz.setUser(user);
-        this.quizRepository.save(quiz);
+            }
+        }
+        return new QuizResult(correct, byId.size());
     }
 
     @Override
-    public void setResult(Long id, Integer score){
-        this.quizRepository.findOneById(id).setCorrect(score);
-    }
-
-
-    @Override
-    public List<Quiz> getTopScore() {
-
-        List<Quiz> quizes = quizRepository.findAll(Sort.by(Sort.Direction.DESC, "correct"));
-
-        return quizes;
-    }
-
-    @Override
-    public void initQuestions(){
-        Question question1 = new Question();
-        question1.setTitle("Who created the cryptocurrency Ethereum?");
-        question1.setOptionA("Satoshi Nakamoto");
-        question1.setOptionB("Vitalik Buterin");
-        question1.setOptionC("Andreas Antonopoulos");
-        question1.setAns(1);
-
-        Question question2 = new Question();
-        question2.setTitle("Who created the cryptocurrency Ethereum?");
-        question2.setOptionA("Satoshi Nakamoto");
-        question2.setOptionB("Vitalik Buterin");
-        question2.setOptionC("Andreas Antonopoulos");
-        question2.setAns(1);
-
-        Question question3 = new Question();
-        question3.setTitle("Who created the cryptocurrency Ethereum?");
-        question3.setOptionA("Satoshi Nakamoto");
-        question3.setOptionB("Vitalik Buterin");
-        question3.setOptionC("Andreas Antonopoulos");
-        question3.setAns(1);
-
-        Question question4 = new Question();
-        question4.setTitle("Who created the cryptocurrency Ethereum?");
-        question4.setOptionA("Satoshi Nakamoto");
-        question4.setOptionB("Vitalik Buterin");
-        question4.setOptionC("Andreas Antonopoulos");
-        question4.setAns(1);
-
-        Question question5 = new Question();
-        question5.setTitle("Who created the cryptocurrency Ethereum?");
-        question5.setOptionA("Satoshi Nakamoto");
-        question5.setOptionB("Vitalik Buterin");
-        question5.setOptionC("Andreas Antonopoulos");
-        question5.setAns(1);
-
-        Question question6 = new Question();
-        question6.setTitle("Who created the cryptocurrency Ethereum?");
-        question6.setOptionA("Satoshi Nakamoto");
-        question6.setOptionB("Vitalik Buterin");
-        question6.setOptionC("Andreas Antonopoulos");
-        question6.setAns(1);
-
-        questionRepository.saveAll(List.of(question1, question2, question3, question4, question5, question6));
-
+    public void initQuestions() {
+        if (questionRepository.count() > 0) {
+            return;
+        }
+        questionRepository.saveAll(List.of(
+                new Question("Who created the cryptocurrency Ethereum?",
+                        "Satoshi Nakamoto", "Vitalik Buterin", "Andreas Antonopoulos", 2),
+                new Question("What is the maximum number of bitcoins that will ever exist?",
+                        "21 million", "100 million", "There is no limit", 1),
+                new Question("What is a blockchain?",
+                        "A type of bank account", "A shared ledger of transactions grouped into linked blocks",
+                        "A programming language for smart contracts", 2),
+                new Question("What does a crypto wallet's private key do?",
+                        "Proves ownership and signs transactions", "Shows your balance to others",
+                        "Speeds up the network", 1),
+                new Question("What is a stablecoin?",
+                        "A coin whose price is fixed by mining difficulty",
+                        "A coin designed to track the value of an asset such as the US dollar",
+                        "A coin that cannot be sold", 2),
+                new Question("What is the process of adding new blocks to the Bitcoin blockchain called?",
+                        "Staking", "Minting", "Mining", 3),
+                new Question("Under which name did the author of the Bitcoin whitepaper publish it?",
+                        "Hal Finney", "Satoshi Nakamoto", "Nick Szabo", 2),
+                new Question("What is a smart contract?",
+                        "A legal contract signed online", "A program that runs on a blockchain when its conditions are met",
+                        "An exchange trading fee agreement", 2)
+        ));
     }
 }

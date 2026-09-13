@@ -1,68 +1,43 @@
 package dev.mstefanov.learncrypto.web;
 
-import dev.mstefanov.learncrypto.model.Quiz;
+import dev.mstefanov.learncrypto.model.binding.QuizSubmission;
+import dev.mstefanov.learncrypto.service.QuizResult;
 import dev.mstefanov.learncrypto.service.QuizService;
-import dev.mstefanov.learncrypto.service.UserService;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.security.Principal;
 
 @Controller
 public class QuizController {
 
     private final QuizService quizService;
-    private final UserService userService;
-    private final ModelMapper modelMapper;
 
-    public QuizController(QuizService quizService, UserService userService, ModelMapper modelMapper) {
+    public QuizController(QuizService quizService) {
         this.quizService = quizService;
-        this.userService = userService;
-        this.modelMapper = modelMapper;
     }
-
 
     @GetMapping("/quiz")
     public String makeQuizForUser(Model model) {
-
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Quiz quiz = this.quizService.makeQuiz();
-
-        model.addAttribute("quiz", quiz);
-
-//        quizService.saveQuiz(quiz, username);
-
+        model.addAttribute("questions", quizService.makeQuiz());
         return "quiz";
     }
 
     @PostMapping("/submit")
-    public String finishQuiz(@ModelAttribute Quiz quiz, Model model) {
+    public String finishQuiz(@ModelAttribute QuizSubmission submission, Principal principal, Model model) {
+        QuizResult result = quizService.score(submission);
 
-//        Integer correct = quizService.getResult(quiz.getId());
-//        quizService.setResult(quiz.getId(), correct);
-
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        model.addAttribute("username", username);
-
+        model.addAttribute("username", principal.getName());
+        model.addAttribute("result", result);
         return "result";
     }
 
-    @GetMapping("/score")
-    public String score(Model model) {
-        List<Quiz> quizes = quizService.getTopScore();
-        model.addAttribute("quizes", quizes);
-
-        return "scoreboard.html";
+    /** Direct GET on /result (e.g. after a refresh) just starts a new quiz. */
+    @GetMapping("/result")
+    public String result() {
+        return "redirect:/quiz";
     }
-
-
-
-
-
 }

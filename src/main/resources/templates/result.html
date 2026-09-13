@@ -63,13 +63,22 @@
             </div>
 
             <div class="d-flex justify-content-center">
-                <p>Total correct answer:&nbsp;&nbsp;</p>
-                <p>0</p>
+                <p>Score:&nbsp;&nbsp;</p>
+                <p><strong th:text="|${result.correct} / ${result.total}|">0 / 0</strong></p>
             </div>
 
             <div class="d-flex justify-content-center">
-                <p>Total false answer:&nbsp;&nbsp;</p>
-                <p>0</p>
+                <p>Total correct answers:&nbsp;&nbsp;</p>
+                <p th:text="${result.correct}">0</p>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <p>Total wrong or skipped answers:&nbsp;&nbsp;</p>
+                <p th:text="${result.wrong}">0</p>
+            </div>
+
+            <div class="d-flex justify-content-center mt-3">
+                <a href="/quiz" class="btn btn-danger mx-2">Try again</a>
             </div>
 
             <div class="d-flex justify-content-center mt-4">

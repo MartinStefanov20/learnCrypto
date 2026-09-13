@@ -1,6 +1,5 @@
 package dev.mstefanov.learncrypto.service.impl;
 
-import dev.mstefanov.learncrypto.model.Result;
 import dev.mstefanov.learncrypto.model.Role;
 import dev.mstefanov.learncrypto.model.User;
 import dev.mstefanov.learncrypto.model.service.UserServiceModel;
