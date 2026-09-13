@@ -15,10 +15,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
@@ -36,9 +36,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     private UserDetails map(User userEntity) {
-
-        Stream<String> s = Stream.of("User");
-
 
         return new org.springframework.security.core.userdetails.User(
                 userEntity.getUsername(),
@@ -94,21 +91,24 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public void initUsers() {
         if (this.userRepository.count() == 0) {
-            User user1 = new User();
-            user1.setUsername("martin.stefanov");
-            user1.setPassword(passwordEncoder.encode("martin"));
-            user1.setFirstName("Martin");
-            user1.setLastName("Stefanov");
-
-            Role roleUser = this.roleService.getNewRole();
-            roleUser.setName("ROLE_USER");
-            roleUser.setUser(user1);
-
-            user1.setRoles(List.of(roleUser));
-
-
-            userRepository.save(user1);
+            userRepository.save(newUser("demo", "demo123", "Demo", "User", "ROLE_USER"));
+            userRepository.save(newUser("admin", "admin123", "Admin", "Account", "ROLE_ADMIN", "ROLE_USER"));
         }
+    }
+
+    private User newUser(String username, String rawPassword, String firstName, String lastName, String... roles) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setRoles(Arrays.stream(roles).map(roleName -> {
+            Role role = this.roleService.getNewRole();
+            role.setName(roleName);
+            role.setUser(user);
+            return role;
+        }).toList());
+        return user;
     }
 
     @Override

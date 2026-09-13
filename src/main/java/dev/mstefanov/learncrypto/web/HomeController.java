@@ -2,6 +2,7 @@ package dev.mstefanov.learncrypto.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class HomeController {
@@ -16,7 +17,8 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/access-denied")
+    /** Any method: Spring Security forwards denied requests here keeping the original verb (e.g. a failed CSRF POST). */
+    @RequestMapping("/access-denied")
     public String accessDenied() {
         return "access-denied";
     }
