@@ -37,7 +37,14 @@ learning site, not a finance product.
 
 ## Screenshots
 
-_Screenshots and a short demo GIF will land in `docs/media/`._
+| | |
+|---|---|
+| **Home** | **Dashboard** — courses and the quiz entry point |
+| ![Home](docs/media/learncrypto-01-home.jpg) | ![Dashboard](docs/media/learncrypto-02-dashboard.jpg) |
+| **Charts** — top 20 coins from CoinGecko, cached 90 s, offline fallback | **Quiz** — five random questions, graded server-side |
+| ![Charts](docs/media/learncrypto-03-charts.jpg) | ![Quiz](docs/media/learncrypto-05-quiz.jpg) |
+| **Login** — demo accounts shown on the page | |
+| ![Login](docs/media/learncrypto-04-login.jpg) | |
 
 ## What was modernised
 
