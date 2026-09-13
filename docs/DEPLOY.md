@@ -95,3 +95,7 @@ manual approval before deploys.
 | `JAVA_TOOL_OPTIONS`  | set in the `Dockerfile`              | AppCDS archive, SerialGC, 70 % RAM, 512 KiB stacks. |
 
 Do **not** activate the `local` Spring profile in production: it exposes the H2 web console.
+
+## Enabling automatic deploys
+
+Add the `GCP_PROJECT`, `WIF_PROVIDER` and `WIF_SERVICE_ACCOUNT` repository secrets, then set the repository variable `CLOUD_RUN_DEPLOY=true` (Settings → Secrets and variables → Actions → Variables). Until then the deploy job is skipped.
