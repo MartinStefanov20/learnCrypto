@@ -1,0 +1,21 @@
+# Build output and IDE state
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# VCS, CI and docs are not needed inside the image
+.git/
+.github/
+docs/
+*.md
+LICENSE
+
+# Local files
+.env
+*.log
+.DS_Store
