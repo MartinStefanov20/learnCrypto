@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Learn Crypto</title>
+    <meta content="" name="descriptison">
+    <meta content="" name="keywords">
+
+    <!-- Google Fonts -->
+    <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+            rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="/assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/assets/vendor/venobox/venobox.css" rel="stylesheet">
+    <link href="/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <link href="/assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+<header id="header" class="fixed-top">
+    <div class="container d-flex align-items-center">
+
+        <a href="/" class="logo mr-auto"><img src="/assets/img/logo.jpg" alt="Learn Crypto"></a>
+
+        <nav class="nav-menu d-none d-lg-block">
+            <ul>
+                <li><a href="/home">Learn Now</a></li>
+                <li><a href="/quiz">Take a test</a></li>
+                <li><a href="/charts">Charts</a></li>
+            </ul>
+        </nav>
+
+    </div>
+</header>
+
+<div class="move"></div>
+<section id="featured-services" class="featured-services">
+    <div class="main-container container py-5 px-4">
+        <div class="card py-5 px-4 mx-auto" style="max-width: 640px;">
+
+            <h3 class="bg-danger text-white text-center mb-4 p-2">
+                Something went wrong
+                <span th:if="${status}" th:text="|(${status})|"></span>
+            </h3>
+
+            <p class="text-center mb-1" th:text="${error} ?: 'Unexpected error'">Error</p>
+            <p class="text-center text-muted" th:if="${message} and ${message} != ''" th:text="${message}"></p>
+            <p class="text-center text-muted" th:if="${status} == 404">The page you were looking for does not exist.</p>
+
+            <div class="d-flex justify-content-center mt-4">
+                <a href="/" class="btn btn-outline-warning mx-2">Front page</a>
+                <a href="/home" class="btn btn-outline-warning mx-2">Learning home</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer id="footer">
+    <div class="container">
+        <div class="copyright">
+            &copy; Copyright <strong><span>Learn Crypto</span></strong>. All Rights Reserved
+        </div>
+    </div>
+</footer><!-- End Footer -->
+
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+
+</body>
+</html>

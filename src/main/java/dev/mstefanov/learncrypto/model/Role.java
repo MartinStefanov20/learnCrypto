@@ -1,16 +1,15 @@
 package dev.mstefanov.learncrypto.model;
 
 import dev.mstefanov.learncrypto.utils.roleValidator.ValidateRole;
-import com.sun.istack.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import static dev.mstefanov.learncrypto.messages.ValidationErrorMessages.INVALID_ROLE;
 
-@Data
 @Entity
 
 @AllArgsConstructor

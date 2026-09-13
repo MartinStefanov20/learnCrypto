@@ -2,6 +2,7 @@ package dev.mstefanov.learncrypto.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.session.SessionRegistry;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
+@EnableCaching
 public class ApplicationBeanConfiguration {
 
     @Bean
@@ -28,8 +30,9 @@ public class ApplicationBeanConfiguration {
         return new SessionRegistryImpl();
     }
 
+    /** Publishes session lifecycle events so the SessionRegistry can track concurrent sessions. */
     @Bean
-    public static ServletListenerRegistrationBean httpSessionEventPublisher() {	//(5)
-        return new ServletListenerRegistrationBean(new HttpSessionEventPublisher());
+    public static ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
+        return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
     }
 }

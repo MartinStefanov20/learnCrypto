@@ -1,74 +1,51 @@
 package dev.mstefanov.learncrypto.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
-    private final SessionRegistry sessionRegistry;
+    /**
+     * Authentication itself is provided by the single {@code UserDetailsService} bean
+     * ({@code UserServiceImpl}) together with the {@code PasswordEncoder} bean; Spring Security
+     * wires them into a DaoAuthenticationProvider automatically.
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index", "/users/login", "/users/login-error", "/users/register",
+                                "/assets/**", "/error", "/actuator/health/**").permitAll()
+                        // matches nothing unless spring.h2.console.enabled=true (the "local" profile)
+                        .requestMatchers(PathRequest.toH2Console()).permitAll()
+                        .requestMatchers("/home", "/basics", "/earn-crypto", "/trade-crypto", "/use-crypto",
+                                "/quiz", "/submit", "/result", "/charts").authenticated()
+                        .anyRequest().authenticated())
+                .csrf(csrf -> csrf.ignoringRequestMatchers(PathRequest.toH2Console()))
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+                .exceptionHandling(ex -> ex.accessDeniedPage("/access-denied"))
+                .formLogin(form -> form
+                        .loginPage("/users/login")
+                        .defaultSuccessUrl("/home", true)
+                        .failureForwardUrl("/users/login-error"))
+                .logout(logout -> logout
+                        .logoutUrl("/users/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID"))
+                .sessionManagement(session -> session
+                        .maximumSessions(100)
+                        .maxSessionsPreventsLogin(false)
+                        .expiredUrl("/users/login")
+                        .sessionRegistry(sessionRegistry));
 
-
-    @Autowired
-    public SecurityConfig(@Qualifier("userServiceImpl") UserDetailsService userDetailsService,
-                          PasswordEncoder passwordEncoder, SessionRegistry sessionRegistry) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
-        this.sessionRegistry = sessionRegistry;
-    }
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth)
-            throws Exception {
-        auth.userDetailsService(this.userDetailsService).passwordEncoder(
-                this.passwordEncoder);
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web
-                .ignoring()
-                .antMatchers("/h2/**");
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        http.sessionManagement()
-                .maximumSessions(100)               //(1)
-                .maxSessionsPreventsLogin(false)    //(2)
-                .expiredUrl("/users/login")          //(3)
-                .sessionRegistry(this.sessionRegistry);
-
-        http.authorizeRequests()
-                .antMatchers("/users/login", "/", "/users/login-error", "/resources/**", "/index").permitAll()
-                .antMatchers("/home", "/basics", "/earn-crypto", "trade-crypto", "use-crypto", "quiz", "result", "charts").hasAnyRole("ADMIN", "USER")
-                .and()
-                .exceptionHandling().accessDeniedPage("/access-denied")
-                .and()
-                .formLogin()
-                .loginPage("/users/login")
-                .successForwardUrl("/home")
-                .failureForwardUrl("/users/login-error")
-                .and()
-                .logout()
-                .logoutUrl("/users/logout")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
-
+        return http.build();
     }
 }
-
