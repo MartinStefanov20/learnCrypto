@@ -55,32 +55,29 @@
     <div class="container py-5 px-4">
         <h1 class="">Select The Correct Answers</h1>
 
-        <form th:action="@{/submit}" action="submit" method="POST" th:object=${quiz}>
-            <div class="ques-box" th:each="question, i: ${quiz.questions}">
-                <p class="title" th:text="${question.title}"></p>
+        <form th:action="@{/submit}" method="POST">
+            <div class="ques-box" th:each="question, i : ${questions}">
+                <p class="title" th:text="|${i.count}. ${question.title}|"></p>
 
                 <div class="option">
-                    <input type="radio" th:name="|questions[${i.index}].choice|" th:value="1" />
-                    <p th:text="${question.optionA}"></p>
+                    <input type="radio" th:id="|q${i.index}a|" th:name="|answers[${i.index}].choice|" value="1" />
+                    <label th:for="|q${i.index}a|" th:text="${question.optionA}"></label>
                 </div>
 
                 <div class="option">
-                    <input type="radio" th:name="|questions[${i.index}].choice|" th:value="2" />
-                    <p th:text="${question.optionB}"></p>
+                    <input type="radio" th:id="|q${i.index}b|" th:name="|answers[${i.index}].choice|" value="2" />
+                    <label th:for="|q${i.index}b|" th:text="${question.optionB}"></label>
                 </div>
 
                 <div class="option">
-                    <input type="radio" th:name="|questions[${i.index}].choice|" th:value="3" />
-                    <p th:text="${question.optionC}"></p>
+                    <input type="radio" th:id="|q${i.index}c|" th:name="|answers[${i.index}].choice|" value="3" />
+                    <label th:for="|q${i.index}c|" th:text="${question.optionC}"></label>
                 </div>
 
-                <input type="hidden" th:name="|questions[${i.index}].id|" th:value="${question.id}" />
-                <input type="hidden" th:name="|questions[${i.index}].title|" th:value="${question.title}" />
-                <input type="hidden" th:name="|questions[${i.index}].ans|" th:value="${question.ans}" />
-
+                <input type="hidden" th:name="|answers[${i.index}].questionId|" th:value="${question.id}" />
             </div>
 
-            <button type="submit" class="btn btn-danger d-block mx-auto mt-4">Submit Answer</button>
+            <button type="submit" class="btn btn-danger d-block mx-auto mt-4">Submit Answers</button>
         </form>
     </div>
 </section>
