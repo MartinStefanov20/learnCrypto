@@ -5,11 +5,11 @@
 ![Spring Boot 3.5](https://img.shields.io/badge/Spring%20Boot-3.5.16-6db33f)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A small crypto-basics learning site: four short courses (basics, earning, trading, using crypto),
-a server-graded quiz and a live top-20 market table fed by the CoinGecko API. Originally a
-university project on Spring Boot 2.7 / Java 16, now modernised end to end: Boot 3.5 on Java 21,
-a hardened security setup, a cached market-data client with an offline fallback, tests, a
-non-root container image with AppCDS and a GitHub Actions pipeline to Cloud Run.
+A crypto-basics learning site: four short courses (basics, earning, trading, using crypto),
+a server-graded quiz and a live top-20 market table fed by the CoinGecko API. Built with Java 21
+and Spring Boot 3 with Thymeleaf and Bootstrap, Spring Security for accounts, a cached market-data
+client with an offline fallback, JUnit 5 tests, a non-root container image and a GitHub Actions
+pipeline to Google Cloud Run.
 
 **Live demo:** _coming soon_
 
@@ -45,19 +45,6 @@ learning site, not a finance product.
 | ![Charts](docs/media/learncrypto-03-charts.jpg) | ![Quiz](docs/media/learncrypto-05-quiz.jpg) |
 | **Login** — demo accounts shown on the page | |
 | ![Login](docs/media/learncrypto-04-login.jpg) | |
-
-## What was modernised
-
-| Area              | Before (2022)                                    | After                                                                    |
-|-------------------|--------------------------------------------------|--------------------------------------------------------------------------|
-| Platform          | Spring Boot 2.7.3, Java 16                       | Spring Boot 3.5.16, Java 21 (records, Jakarta EE 10, Hibernate 6)        |
-| Market data       | Hard-coded paid API key committed to the repo    | CoinGecko free API via `RestClient`, 90 s Caffeine cache, offline fallback snapshot with a stale flag |
-| Quiz              | Broken client-side scoring                       | Server-side scoring (`QuizService.score`), correct answers never sent to the browser |
-| Security          | `WebSecurityConfigurerAdapter` (Security 5)      | `SecurityFilterChain` bean, explicit matchers, H2 console only in the `local` profile |
-| Database          | MySQL required to start                          | H2 in-memory, zero setup, seeded demo data                               |
-| Tests             | Context-load only                                | MockMvc security and login-flow tests, quiz scoring unit test, `@RestClientTest` for the API client |
-| Container         | none                                             | Multi-stage `Dockerfile`: layered Spring Boot image, non-root user, AppCDS archive (about 30 % faster start) |
-| CI/CD             | none                                             | GitHub Actions: build, test and Docker build on every push; WIF-based deploy to Cloud Run |
 
 ## Run locally
 
