@@ -2,7 +2,7 @@
 #
 # Multi-stage build for the Learn Crypto Spring Boot app.
 #
-#   build   - compiles and packages the fat jar with Maven (dependencies cached via BuildKit)
+#   build   - compiles and packages the fat jar with Maven
 #   extract - splits the jar into Spring Boot layers using the *runtime* JVM image
 #   runtime - small JRE image, non-root, layered COPYs, AppCDS archive trained in place
 #
@@ -18,10 +18,10 @@ WORKDIR /workspace
 # Resolve dependencies first so this layer is reused as long as pom.xml does not change.
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
-RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q dependency:go-offline
+RUN ./mvnw -B -q dependency:go-offline
 
 COPY src src
-RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q -DskipTests package \
+RUN ./mvnw -B -q -DskipTests package \
     && cp target/*.jar app.jar
 
 # ---------------------------------------------------------------------------------------------
