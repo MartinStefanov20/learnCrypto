@@ -11,7 +11,7 @@ and Spring Boot 3 with Thymeleaf and Bootstrap, Spring Security for accounts, a 
 client with an offline fallback, JUnit 5 tests, a non-root container image and a GitHub Actions
 pipeline to Google Cloud Run.
 
-**Live demo:** _coming soon_
+**Live demo:** https://learncrypto-42945051810.europe-west3.run.app
 
 | Account | Username | Password   | Roles                   |
 |---------|----------|------------|-------------------------|
